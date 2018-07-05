@@ -11,7 +11,7 @@ import time
 
 # Parser
 parser = argparse.ArgumentParser(
-    description='This script will extract elements from the input file (XML) into a textfile, ready for import into a SQL database')
+    description='This script will extract elements from the input file (XML) into a CSV file,')
 parser.add_argument('strings', type=str, nargs='+',
                     help='The input file for extraction')
 args = parser.parse_args().strings
@@ -20,7 +20,7 @@ args = parser.parse_args().strings
 # Without any file extensions and path
 inputFileName = (os.path.basename(os.path.splitext(args[0])[0]))
 outputFileName = os.path.dirname(os.path.realpath(
-    __file__)) + "\\ " + inputFileName + "--output.csv"
+    __file__)) + "\\" + inputFileName + "--output.csv"
 outputFile = open(outputFileName, "w+")  # Output file
 
 # Total lines written to file
@@ -47,14 +47,20 @@ def fileSize(fileN):
     else:
         return str(size)
 
+def clearArray(inputArray):
+    outputArray = []
+    for x in inputArray:
+        outputArray.append("")
+
+    return outputArray;
 
 splitCharacter = ","  # Character splitting per field
 
 
-fieldNames = [""]
+fieldNames = ["TesterTag","EmptyTag","AnotherTag"]
 
 outnames = list(fieldNames)
-outnames[0] = ""
+outnames[0] = '"TesterTag","EmptyTag","AnotherTag"'
 outputFile.write(','.join(outnames))
 outputFile.write("\n")
 
@@ -92,12 +98,18 @@ for inputFiles in args:
             info.append(infoString)  # Add text to info array
             for index, field in enumerate(fieldNames):
 
-                if elem.tag == field or elem.tag == "Date":
-                    if index >= 0 and index <= 5:
-                        found[index] = infoString
-                        idFound = True
+                if elem.tag == field:
+                    found[index] = infoString
+                    # idFound = True
 
-            if len(info) and len(path) > 10000:
+            
+
+            for x in found:
+                writeToFile('"'+x+'"')
+                outputFile.write("\n")
+                found = clearArray(found)
+
+            if len(info) and len(path) > 10000: # Clear memory every 10000 rows outputted
                 del info[:delArray]
                 del path[:delArray]
 
